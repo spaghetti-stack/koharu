@@ -12,6 +12,7 @@
     "downloadingFiles_one": "正在下載 {{count}} 個檔案",
     "downloadingFiles_other": "正在下載 {{count}} 個檔案",
     "modelDownload": "模型下載",
+    "pageLabel": "第 {{number}} 頁：{{label}}",
     "processing": "正在處理",
     "processingFailed": "處理失敗。",
     "stop": "停止",
@@ -245,8 +246,7 @@
     "delete": "刪除所選項目",
     "discord": "Discord",
     "edit": "編輯",
-    "exportPng": "匯出 PNG…",
-    "exportPsd": "匯出 PSD…",
+    "export": "匯出專案",
     "exportText": "匯出文字…",
     "exportSourceTexts": "原文文字",
     "exportTranslations": "譯文",
@@ -254,7 +254,7 @@
     "fit": "適應視窗",
     "github": "GitHub",
     "help": "說明",
-    "importPages": "匯入頁面…",
+    "import": "匯入頁面",
     "importText": "匯入文字…",
     "process": "處理",
     "processLayers": "處理所選圖層",
@@ -301,7 +301,8 @@
     "pages": "頁面",
     "rename": "重新命名",
     "renameDescription": "為此頁面選擇新名稱。",
-    "renameTitle": "重新命名頁面"
+    "renameTitle": "重新命名頁面",
+    "selected": "已選擇 {{count}}"
   },
   "outputPicker": {
     "instructions": "翻譯指示",
@@ -322,7 +323,6 @@
     "translation": "將原文翻譯為目標語言。"
   },
   "providerDescriptions": {
-    "atlas-cloud": "由 Atlas 託管的語言模型。",
     "caiyun": "Caiyun 翻譯 API。",
     "claude": "Anthropic Claude 模型。",
     "deepl": "DeepL 翻譯 API。",

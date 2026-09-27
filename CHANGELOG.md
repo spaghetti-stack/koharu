@@ -1,3 +1,196 @@
+## [0.83.5](https://github.com/koharu-rs/koharu/compare/0.83.4..0.83.5) - 2026-09-22
+
+### 🐛 Bug Fixes
+
+- *(ci)* Recover incomplete release asset uploads - ([19430a0](https://github.com/koharu-rs/koharu/commit/19430a0810f83b0eb2f85045968301557c27ea8b))
+
+
+## [0.83.4](https://github.com/koharu-rs/koharu/compare/0.83.3..0.83.4) - 2026-09-17
+
+### 🐛 Bug Fixes
+
+- *(deps)* Align gpu-allocator Windows bindings - ([19197a7](https://github.com/koharu-rs/koharu/commit/19197a77481d4a36e2091dec163014886ff6743f))
+
+
+## [0.83.3](https://github.com/koharu-rs/koharu/compare/0.83.2..0.83.3) - 2026-09-16
+
+### 🐛 Bug Fixes
+
+- *(desktop)* Force X11 ozone platform for Linux CEF ([#1110](https://github.com/koharu-rs/koharu/issues/1110)) - ([c1e9d23](https://github.com/koharu-rs/koharu/commit/c1e9d23e25e6568f53b827a82a91994467adede9))
+
+
+## [0.83.2](https://github.com/koharu-rs/koharu/compare/0.83.1..0.83.2) - 2026-09-15
+
+### 🐛 Bug Fixes
+
+- *(app)* Skip Windows store configuration in debug builds - ([3cb9791](https://github.com/koharu-rs/koharu/commit/3cb979116485d9a7deb59ee54f0fae6b48bb4274))
+- *(canvas)* Preserve authored text rotation - ([6d53328](https://github.com/koharu-rs/koharu/commit/6d5332817c96e493b14c6d6915881e078d968ea9))
+- *(renderer)* Preserve joined balloon text placement - ([b5f3c41](https://github.com/koharu-rs/koharu/commit/b5f3c41c589431a34c9c148074a057f7c176746f))
+- *(translator)* Cache model-listing client with five-second timeout ([#1103](https://github.com/koharu-rs/koharu/issues/1103)) - ([bc1a51b](https://github.com/koharu-rs/koharu/commit/bc1a51b67e50612a8dcbe00827ce22746c988d11))
+
+
+## [0.83.1](https://github.com/koharu-rs/koharu/compare/0.83.0..0.83.1) - 2026-09-15
+
+### 🐛 Bug Fixes
+
+- *(ci)* Install GTK 4 for Tauri v3 - ([7c34594](https://github.com/koharu-rs/koharu/commit/7c34594560f406098372f8a1867a700db6a2d938))
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove Atlas Cloud provider and sponsorship - ([9e8698b](https://github.com/koharu-rs/koharu/commit/9e8698be9c85a4446cc99a3c310a24ec0a720ea7))
+
+
+## [0.83.0](https://github.com/koharu-rs/koharu/compare/0.82.1..0.83.0) - 2026-09-14
+
+### ⛰️  Features
+
+- *(activity)* Name the page a pipeline run is working on ([#1041](https://github.com/koharu-rs/koharu/issues/1041)) - ([1a65f3e](https://github.com/koharu-rs/koharu/commit/1a65f3e7ab1263c795a342e5614014faafb6a4b3))
+- *(navigator)* Say how many pages a selection covers ([#1096](https://github.com/koharu-rs/koharu/issues/1096)) - ([5ab47ee](https://github.com/koharu-rs/koharu/commit/5ab47ee738c9faa1e03f764bf93e850dcaa1149e))
+- *(ui)* Show download state for local translation models ([#1039](https://github.com/koharu-rs/koharu/issues/1039)) - ([d8a68ba](https://github.com/koharu-rs/koharu/commit/d8a68ba2f380a18199a68bf40c6633f9db1ae7fb))
+- Export a project as a CBZ archive ([#1095](https://github.com/koharu-rs/koharu/issues/1095)) - ([69e67f9](https://github.com/koharu-rs/koharu/commit/69e67f96337151b03890a774f4983acc207ff145))
+
+### 🐛 Bug Fixes
+
+- *(app)* Support ctrl and shift multi-select in the layer panel ([#1089](https://github.com/koharu-rs/koharu/issues/1089)) - ([eaa42f2](https://github.com/koharu-rs/koharu/commit/eaa42f240824796e3a0422ddd9c880c2cd2f2bd2))
+- *(ui)* Long project names pushing the delete button off screen ([#1093](https://github.com/koharu-rs/koharu/issues/1093)) - ([0704f7f](https://github.com/koharu-rs/koharu/commit/0704f7f81ad7a992b62eab642a4b6706f782af77))
+
+
+## [0.82.1](https://github.com/koharu-rs/koharu/compare/0.82.0..0.82.1) - 2026-09-11
+
+### 🐛 Bug Fixes
+
+- *(ci)* Pin AppImage helper source URL - ([a7431c5](https://github.com/koharu-rs/koharu/commit/a7431c5a5e7517cb7413309e4e4da5679efa20b1))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(app)* Default the processing scope to the selection ([#1088](https://github.com/koharu-rs/koharu/issues/1088)) - ([767e4d0](https://github.com/koharu-rs/koharu/commit/767e4d0441f986c18e55fc4e1af42f3dddfd860e))
+
+
+## [0.82.0](https://github.com/koharu-rs/koharu/compare/0.81.10..0.82.0) - 2026-09-11
+
+### ⛰️  Features
+
+- *(runtime)* Update native runtimes and CUDA 13.3 - ([67d507b](https://github.com/koharu-rs/koharu/commit/67d507b4cf3959208e87201f62b03ba771d3f372))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(scripts)* Add Kindle JP downloader - ([8ccfe9f](https://github.com/koharu-rs/koharu/commit/8ccfe9ffafd8037e06c8999213dd55a78a6f7b37))
+
+
+## [0.81.9](https://github.com/koharu-rs/koharu/compare/0.81.8..0.81.9) - 2026-09-08
+
+### 🐛 Bug Fixes
+
+- *(runtime)* Update Torch to v2.13.0.6 - ([7a6884a](https://github.com/koharu-rs/koharu/commit/7a6884a67b3c0a4b1f48f69eb59dd2230292b0c7))
+
+### 🚜 Refactor
+
+- *(runtime)* Simplify accelerator discovery - ([087b40a](https://github.com/koharu-rs/koharu/commit/087b40aabc9d26c1f0195916963f1980ac7d6f09))
+
+### ⚙️ Miscellaneous Tasks
+
+- Align contribution template wording with OSS conventions - ([edfbf84](https://github.com/koharu-rs/koharu/commit/edfbf8428d33e726ba8530c6b9ca9610015b62a5))
+- Shorten issue template filenames - ([7f046cb](https://github.com/koharu-rs/koharu/commit/7f046cb7f59d9ff18103696f7d80ed5b34c8c9d3))
+- Simplify contribution templates and use issue types - ([e29860a](https://github.com/koharu-rs/koharu/commit/e29860a75f551f1e0d5d4384eda8dc98aba97d73))
+
+
+## [0.81.8](https://github.com/koharu-rs/koharu/compare/0.81.7..0.81.8) - 2026-09-08
+
+### 🐛 Bug Fixes
+
+- *(app)* Disable devtools to prevent F12 crash ([#1042](https://github.com/koharu-rs/koharu/issues/1042)) ([#1044](https://github.com/koharu-rs/koharu/issues/1044)) - ([fa9d907](https://github.com/koharu-rs/koharu/commit/fa9d90727c8187c965951e0c3762a548e5497250))
+- *(runtime)* Skip unsupported Linux ROCm targets - ([e460a9b](https://github.com/koharu-rs/koharu/commit/e460a9bfd3b02ea2bbdb6701f956bb0df3cbd0b8))
+
+### 📚 Documentation
+
+- Align documentation with implementation - ([4f8216a](https://github.com/koharu-rs/koharu/commit/4f8216aec1e948c53aef6e63b0dcb7ff83142c2e))
+- Migrate site to Mintlify ([#1049](https://github.com/koharu-rs/koharu/issues/1049)) - ([15ab5a6](https://github.com/koharu-rs/koharu/commit/15ab5a651916c9a0801ca612fda851cf74079866))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(editor)* Change default brush color to pure white ([#1053](https://github.com/koharu-rs/koharu/issues/1053)) - ([6bdac20](https://github.com/koharu-rs/koharu/commit/6bdac20428388918564294cf8e8b98dcecf74c6c))
+- Update feature request template name and label - ([fb1071a](https://github.com/koharu-rs/koharu/commit/fb1071a8e701128738de9b29b17d45034fd3dd54))
+
+
+## [0.81.7](https://github.com/koharu-rs/koharu/compare/0.81.6..0.81.7) - 2026-09-05
+
+### 🐛 Bug Fixes
+
+- *(app)* Remove ineffective hide-chrome-bubbles flag - ([5e317b6](https://github.com/koharu-rs/koharu/commit/5e317b6255faf2802b5a7e3a58a2719f0e0a86c5))
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove summary GHA - ([3a0c6a3](https://github.com/koharu-rs/koharu/commit/3a0c6a366d5355dee7a19cc905f28d84afa6e4b8))
+
+
+## [0.81.6](https://github.com/koharu-rs/koharu/compare/0.81.5..0.81.6) - 2026-09-04
+
+### 🐛 Bug Fixes
+
+- *(app)* Pass Linux CEF switches correctly - ([24bda3a](https://github.com/koharu-rs/koharu/commit/24bda3a5cc9d47ed45b0d118cbf0711c3b46effe))
+
+
+## [0.81.5](https://github.com/koharu-rs/koharu/compare/0.81.4..0.81.5) - 2026-09-03
+
+### 🐛 Bug Fixes
+
+- *(updater)* Install Windows updates quietly - ([e2df1f6](https://github.com/koharu-rs/koharu/commit/e2df1f60ad3850b79d78b224dc698de6c2d82c8b))
+
+
+## [0.81.4](https://github.com/koharu-rs/koharu/compare/0.81.3..0.81.4) - 2026-09-03
+
+### 🐛 Bug Fixes
+
+- *(translator)* Recover model responses the JSON repair layer rejects ([#1022](https://github.com/koharu-rs/koharu/issues/1022)) - ([e6d330c](https://github.com/koharu-rs/koharu/commit/e6d330c83a76ed3efa1f7ab15988f81544df8219))
+
+
+## [0.81.3](https://github.com/koharu-rs/koharu/compare/0.81.2..0.81.3) - 2026-09-03
+
+### 🐛 Bug Fixes
+
+- *(ci)* Remove AppImage bundle target ([#1035](https://github.com/koharu-rs/koharu/issues/1035)) ([#1037](https://github.com/koharu-rs/koharu/issues/1037)) - ([859ae68](https://github.com/koharu-rs/koharu/commit/859ae68a6c012afe349bedffc616e38a929b8f19))
+
+
+## [0.81.2](https://github.com/koharu-rs/koharu/compare/0.81.1..0.81.2) - 2026-09-03
+
+### 🐛 Bug Fixes
+
+- *(agent)* Recover from invalidated Codex refresh tokens ([#1034](https://github.com/koharu-rs/koharu/issues/1034)) - ([5f299cd](https://github.com/koharu-rs/koharu/commit/5f299cd88e2ecfd834823a6e62068f420a72f73a))
+
+
+## [0.81.1](https://github.com/koharu-rs/koharu/compare/0.81.0..0.81.1) - 2026-09-02
+
+### ⚙️ Miscellaneous Tasks
+
+- Build Linux ARM64 application - ([4add6d8](https://github.com/koharu-rs/koharu/commit/4add6d8d7a60f7a7cafc70a9b756fae4a3b0dd6a))
+
+
+## [0.81.0](https://github.com/koharu-rs/koharu/compare/0.80.0..0.81.0) - 2026-09-02
+
+### ⛰️  Features
+
+- *(runtime)* Support Linux ARM64 CUDA - ([892db6b](https://github.com/koharu-rs/koharu/commit/892db6bfe0d4e1f461793341a26607bfddbba59a))
+- *(runtime)* Support all ROCm 10 targets - ([1938566](https://github.com/koharu-rs/koharu/commit/193856650c85352eff530fbfbab75ef83e6679d9))
+
+### 🐛 Bug Fixes
+
+- *(runtime)* Align ROCm targets with llama.cpp - ([eadb797](https://github.com/koharu-rs/koharu/commit/eadb7976450ded81849d88b79e1d0f279da6c928))
+- *(runtime)* Drop unsupported gfx1250 - ([64173ab](https://github.com/koharu-rs/koharu/commit/64173abbc4fd4c089bf5c3d8a9e350c483e4cbef))
+- *(runtime)* Use exact ROCm library paths - ([eb06347](https://github.com/koharu-rs/koharu/commit/eb063470e06a8c8fdc2e510774996915c869fbba))
+
+### 🚜 Refactor
+
+- *(runtime)* Inline ROCm device library check - ([9152946](https://github.com/koharu-rs/koharu/commit/9152946a89e96fa2cc9ec78c7385d190afa0c014))
+
+### 🧪 Testing
+
+- *(runtime)* Remove gfx1250 reference - ([c3e79e6](https://github.com/koharu-rs/koharu/commit/c3e79e689179921c70de04cb5ac9913afb3ce8a5))
+
+### ⚙️ Miscellaneous Tasks
+
+- Update sponsors ([#943](https://github.com/koharu-rs/koharu/issues/943)) - ([687af18](https://github.com/koharu-rs/koharu/commit/687af180abcd5ecb69994d997acfcef115ad560f))
+
+
 ## [0.80.0](https://github.com/koharu-rs/koharu/compare/0.79.5..0.80.0) - 2026-08-31
 
 ### ⛰️  Features

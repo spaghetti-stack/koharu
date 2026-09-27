@@ -15,6 +15,7 @@ import {
   pagesKey,
   projectKey,
   refresh,
+  useCommand,
   useImportPages,
   usePage,
   usePages,
@@ -52,6 +53,11 @@ export function TitleBar() {
   const setSettingsOpen = useKoharuStore((state) => state.setSettingsOpen)
   const requestCanvasFit = useKoharuStore((state) => state.requestCanvasFit)
   const { importPages, importing } = useImportPages()
+  const { run: exportProject, busy: exporting } = useCommand(
+    ['export-project'],
+    commands.export,
+    'menu.export',
+  )
 
   const run = (scope: Scope, operation: Operation = { operation: 'full' }) =>
     void call(commands.process, scope, operation).catch(() => undefined)
@@ -111,7 +117,7 @@ export function TitleBar() {
                   className='min-h-8 gap-1.5 px-2 py-1 text-xs'
                 >
                   {importing && <LoaderCircle className='animate-spin' aria-hidden='true' />}
-                  {importing ? t('navigator.importing') : t('menu.importPages')}
+                  {importing ? t('navigator.importing') : t('menu.import')}
                 </MenubarSubTrigger>
                 <MenubarSubContent className='min-w-40 p-1'>
                   <MenubarItem disabled={importing} onClick={() => importPages('files')}>
@@ -137,22 +143,27 @@ export function TitleBar() {
                   </MenubarItem>
                 </MenubarSubContent>
               </MenubarSub>
-              <MenubarItem
-                disabled={!project || pages.length === 0}
-                onClick={() =>
-                  void call(commands.exportPages, exportSelection(selectedPages, page?.id), 'png')
-                }
-              >
-                {t('menu.exportPng')}
-              </MenubarItem>
-              <MenubarItem
-                disabled={!project || pages.length === 0}
-                onClick={() =>
-                  void call(commands.exportPages, exportSelection(selectedPages, page?.id), 'psd')
-                }
-              >
-                {t('menu.exportPsd')}
-              </MenubarItem>
+              <MenubarSub>
+                <MenubarSubTrigger
+                  disabled={!project || pages.length === 0 || exporting}
+                  aria-busy={exporting}
+                  className='min-h-8 gap-1.5 px-2 py-1 text-xs'
+                >
+                  {exporting && <LoaderCircle className='animate-spin' aria-hidden='true' />}
+                  {t('menu.export')}
+                </MenubarSubTrigger>
+                <MenubarSubContent className='min-w-40 p-1'>
+                  {(['png', 'psd', 'cbz'] as const).map((format) => (
+                    <MenubarItem
+                      key={format}
+                      disabled={exporting}
+                      onClick={() => exportProject(format)}
+                    >
+                      {format.toUpperCase()}…
+                    </MenubarItem>
+                  ))}
+                </MenubarSubContent>
+              </MenubarSub>
               <MenubarSub>
                 <MenubarSubTrigger disabled={!project || pages.length === 0}>
                   {t('menu.exportText')}
@@ -321,11 +332,6 @@ export function TitleBar() {
       <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
     </>
   )
-}
-
-function exportSelection(selected: string[], active?: string): string[] {
-  if (selected.length) return selected
-  return active ? [active] : []
 }
 
 function MenubarTrigger({ className, ...props }: ComponentProps<typeof UiMenubarTrigger>) {
