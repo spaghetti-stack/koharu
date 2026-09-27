@@ -1,5 +1,6 @@
 'use client'
 
+import { FullContextControl } from '@/components/editor/FullContextControl'
 import { InferenceControl } from '@/components/editor/InferenceControl'
 import { call } from '@/lib/backend'
 import { usePage } from '@/lib/queries'
@@ -32,6 +33,7 @@ export function CanvasCommandBar() {
   return (
     <header className='flex h-10 shrink-0 items-center gap-2 border-b border-border/80 bg-[var(--surface-toolbar)] px-2.5'>
       <div className='min-w-0 flex-1' />
+      <FullContextControl disabled={!page} />
       <InferenceControl disabled={!page || Boolean(running)} onRun={run} />
     </header>
   )

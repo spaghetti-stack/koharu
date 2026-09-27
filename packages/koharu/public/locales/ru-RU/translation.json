@@ -128,6 +128,7 @@
     "currentPageDescription": "Обработать только страницу на холсте.",
     "entireProject": "Весь проект",
     "entireProjectDescription": "Обработать все страницы проекта.",
+    "fullContext": "Перевод с полным контекстом",
     "model": "Модель",
     "noModel": "Нет модели",
     "notSet": "Не задано",

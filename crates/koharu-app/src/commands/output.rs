@@ -7,7 +7,7 @@ use image::{
 use koharu_psd::{PsdExportOptions, export_page};
 use koharu_rasterizer::{Raster, RasterOptions, Rasterizer};
 use koharu_renderer::{Frame, Renderer};
-use koharu_scene::{AssetRole, EntityId, Snapshot};
+use koharu_scene::{AssetRole, Commit, EntityId, Generation, LanguageTag, Snapshot};
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -15,7 +15,11 @@ use std::{io::Write as _, sync::Arc};
 use tauri::{State, WebviewWindow, ipc::IpcResponse};
 use tauri_runtime_cef::CefRuntime;
 
-use super::{ChannelExt as _, Error, canvas::CanvasChannel, project::CurrentProject};
+use super::{
+    ChannelExt as _, Error,
+    canvas::CanvasChannel,
+    project::{CurrentProject, Project},
+};
 use koharu_desktop::Desktop;
 
 const THUMBNAIL_EDGE: u32 = 128;
@@ -46,14 +50,26 @@ pub(crate) enum TextExportKind {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-struct TextExport {
-    pages: Vec<TextExportPage>,
+pub(crate) struct TextExport {
+    pub(crate) pages: Vec<TextExportPage>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-struct TextExportPage {
-    page: usize,
-    texts: Vec<String>,
+pub(crate) struct TextExportPage {
+    pub(crate) page: usize,
+    pub(crate) texts: Vec<String>,
+}
+
+/// Attribution applied to imported text.
+#[derive(Clone)]
+pub(crate) enum TextExportOrigin {
+    /// The caller authored the text (manual file import).
+    User,
+    /// A machine produced the text. User-authored translations are preserved.
+    Generated {
+        generation: Generation,
+        language: Option<LanguageTag>,
+    },
 }
 
 #[derive(Debug, Serialize, Type)]
@@ -190,96 +206,9 @@ pub(crate) async fn import_texts(
     let (commit, page, result) = {
         let mut project = project.project.lock().await;
         let project = project.as_mut().context("no project is open")?;
-        let snapshot = project.snapshot();
-        let page_ids = snapshot.pages().map(|page| page.id()).collect::<Vec<_>>();
-        let mut last_commit = None;
-        let mut revisions = Vec::new();
-        let mut applied = 0_u32;
-        let mut skipped = Vec::new();
-
-        for (page_index, page_id) in page_ids.into_iter().enumerate() {
-            let page_number = page_index + 1;
-            let page = snapshot.page(page_id)?;
-            let mut text_layers = Vec::new();
-            let group = match page.text_group() {
-                Ok(group) => group,
-                Err(error) => {
-                    skipped.push(ImportTextsSkip {
-                        page: page_number as u32,
-                        reason: format!("failed to read text group: {error}"),
-                    });
-                    continue;
-                }
-            };
-            if let Some(group) = group {
-                let layers = match group.text_layers() {
-                    Ok(layers) => layers,
-                    Err(error) => {
-                        skipped.push(ImportTextsSkip {
-                            page: page_number as u32,
-                            reason: format!("failed to read text layers: {error}"),
-                        });
-                        continue;
-                    }
-                };
-                for layer in layers {
-                    text_layers.push(layer.id());
-                }
-            }
-
-            if text_layers.is_empty() {
-                continue;
-            }
-            let Some(page_export) = export.pages.iter().find(|page| page.page == page_number)
-            else {
-                continue;
-            };
-            if page_export.texts.len() != text_layers.len() {
-                skipped.push(ImportTextsSkip {
-                    page: page_number as u32,
-                    reason: format!(
-                        "text count mismatch: expected {}, got {}",
-                        text_layers.len(),
-                        page_export.texts.len()
-                    ),
-                });
-                continue;
-            }
-
-            for (layer, text) in text_layers.into_iter().zip(&page_export.texts) {
-                let commit = match import_kind {
-                    TextExportKind::Source => project.set_source_text(layer, text.clone()).await,
-                    TextExportKind::Translation => {
-                        project.set_translation(layer, Some(text.clone())).await
-                    }
-                };
-                match commit {
-                    Ok(commit) => {
-                        revisions.push(commit.revision);
-                        last_commit = Some(commit);
-                    }
-                    Err(error) => {
-                        skipped.push(ImportTextsSkip {
-                            page: page_number as u32,
-                            reason: format!("failed to apply text: {error}"),
-                        });
-                        break;
-                    }
-                };
-            }
-            applied += 1;
-        }
-        project.record(revisions);
-
-        (
-            last_commit,
-            project.active_page(),
-            ImportTextsResult {
-                applied,
-                skipped,
-                errors: Vec::new(),
-            },
-        )
+        let (commit, result) =
+            import_text_export(project, &export, import_kind, TextExportOrigin::User).await?;
+        (commit, project.active_page(), result)
     };
 
     if let Some(commit) = commit {
@@ -287,6 +216,128 @@ pub(crate) async fn import_texts(
         canvas_channel.channel.publish(desktop.canvas_state());
     }
     Ok(result)
+}
+
+/// Applies a parsed text document to every matching project page.
+///
+/// Page numbers are 1-based positions over `snapshot.pages()`; a page is
+/// skipped when its text-layer count does not match. Shared by the manual
+/// import command and whole-work translation.
+pub(crate) async fn import_text_export(
+    project: &mut Project,
+    export: &TextExport,
+    import_kind: TextExportKind,
+    origin: TextExportOrigin,
+) -> Result<(Option<Commit>, ImportTextsResult)> {
+    let snapshot = project.snapshot();
+    let page_ids = snapshot.pages().map(|page| page.id()).collect::<Vec<_>>();
+    // Machine translation returns `""` for text it left unchanged; a manual
+    // document may legitimately clear a field, so only generated imports skip.
+    let skip_empty = matches!(origin, TextExportOrigin::Generated { .. });
+    let mut last_commit = None;
+    let mut revisions = Vec::new();
+    let mut applied = 0_u32;
+    let mut skipped = Vec::new();
+
+    for (page_index, page_id) in page_ids.into_iter().enumerate() {
+        let page_number = page_index + 1;
+        let page = snapshot.page(page_id)?;
+        let mut text_layers = Vec::new();
+        let group = match page.text_group() {
+            Ok(group) => group,
+            Err(error) => {
+                skipped.push(ImportTextsSkip {
+                    page: page_number as u32,
+                    reason: format!("failed to read text group: {error}"),
+                });
+                continue;
+            }
+        };
+        if let Some(group) = group {
+            let layers = match group.text_layers() {
+                Ok(layers) => layers,
+                Err(error) => {
+                    skipped.push(ImportTextsSkip {
+                        page: page_number as u32,
+                        reason: format!("failed to read text layers: {error}"),
+                    });
+                    continue;
+                }
+            };
+            for layer in layers {
+                text_layers.push(layer.id());
+            }
+        }
+
+        if text_layers.is_empty() {
+            continue;
+        }
+        let Some(page_export) = export.pages.iter().find(|page| page.page == page_number) else {
+            continue;
+        };
+        if page_export.texts.len() != text_layers.len() {
+            skipped.push(ImportTextsSkip {
+                page: page_number as u32,
+                reason: format!(
+                    "text count mismatch: expected {}, got {}",
+                    text_layers.len(),
+                    page_export.texts.len()
+                ),
+            });
+            continue;
+        }
+
+        for (layer, text) in text_layers.into_iter().zip(&page_export.texts) {
+            if skip_empty && text.trim().is_empty() {
+                continue;
+            }
+            let commit = match (import_kind, origin.clone()) {
+                (TextExportKind::Source, _) => {
+                    project.set_source_text(layer, text.clone()).await.map(Some)
+                }
+                (TextExportKind::Translation, TextExportOrigin::User) => project
+                    .set_translation(layer, Some(text.clone()))
+                    .await
+                    .map(Some),
+                (
+                    TextExportKind::Translation,
+                    TextExportOrigin::Generated {
+                        generation,
+                        language,
+                    },
+                ) => {
+                    project
+                        .set_translation_generated(layer, text.clone(), generation, language)
+                        .await
+                }
+            };
+            match commit {
+                Ok(Some(commit)) => {
+                    revisions.push(commit.revision);
+                    last_commit = Some(commit);
+                }
+                Ok(None) => {}
+                Err(error) => {
+                    skipped.push(ImportTextsSkip {
+                        page: page_number as u32,
+                        reason: format!("failed to apply text: {error}"),
+                    });
+                    break;
+                }
+            }
+        }
+        applied += 1;
+    }
+    project.record(revisions);
+
+    Ok((
+        last_commit,
+        ImportTextsResult {
+            applied,
+            skipped,
+            errors: Vec::new(),
+        },
+    ))
 }
 
 #[tracing::instrument(

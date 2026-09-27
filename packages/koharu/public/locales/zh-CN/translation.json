@@ -128,6 +128,7 @@
     "currentPageDescription": "仅处理画布中的页面。",
     "entireProject": "整个项目",
     "entireProjectDescription": "处理此项目中的每个页面。",
+    "fullContext": "全篇上下文翻译",
     "model": "模型",
     "noModel": "无模型",
     "notSet": "未设置",

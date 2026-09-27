@@ -128,6 +128,7 @@
     "currentPageDescription": "캔버스의 페이지만 처리합니다.",
     "entireProject": "전체 프로젝트",
     "entireProjectDescription": "이 프로젝트의 모든 페이지를 처리합니다.",
+    "fullContext": "전체 맥락 번역",
     "model": "모델",
     "noModel": "모델 없음",
     "notSet": "설정되지 않음",

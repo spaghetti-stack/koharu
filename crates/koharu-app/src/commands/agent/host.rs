@@ -1,4 +1,4 @@
-use std::{future::Future, pin::Pin, sync::OnceLock};
+use std::{future::Future, pin::Pin, sync::Arc, sync::OnceLock};
 
 use anyhow::{Context as _, Result, anyhow, bail};
 use async_trait::async_trait;
@@ -116,6 +116,40 @@ impl KoharuHost {
         Ok(())
     }
 
+    async fn run_full_context(&self, control: &Control) -> Result<Invocation> {
+        let stop = StopToken::default();
+        let job = JobId::new();
+        {
+            let processing = self.handle.state::<Processing>();
+            let mut stops = processing.stops.lock();
+            if !stops.is_empty() {
+                bail!("another pipeline process is already running");
+            }
+            stops.insert(job, stop.clone());
+        }
+        let watcher = tauri::async_runtime::spawn({
+            let control = control.clone();
+            let stop = stop.clone();
+            async move {
+                control.cancelled().await;
+                stop.stop();
+            }
+        });
+        let progress: crate::commands::full_context::ProgressReporter = Arc::new(|_| {});
+        let result = crate::commands::full_context::execute(&self.handle, stop.clone(), progress)
+            .await;
+        watcher.abort();
+        self.handle.state::<Processing>().stops.lock().remove(&job);
+        let outcome = result?;
+        if outcome.stopped {
+            bail!("whole-work translation was cancelled");
+        }
+        Invocation::changed(json!({
+            "translated_pages": outcome.translated_pages,
+            "failed_pages": outcome.failed_pages,
+        }))
+    }
+
     async fn run_pipeline(&self, arguments: RunPipeline, control: &Control) -> Result<Invocation> {
         let scope = arguments.scope()?;
         let operation = arguments.operation.into();
@@ -224,6 +258,10 @@ impl Host for KoharuHost {
                     definition::<RunPipeline>(
                         "run_pipeline",
                         "Run Koharu's configured processing pipeline for the whole project, selected pages, or selected text elements.",
+                    ),
+                    definition::<RunFullContext>(
+                        "full_context_translate",
+                        "Run detection and OCR, translate every page together with whole-work context through the external translator, then inpaint the result. Prefer this over run_pipeline translation when cross-page context matters.",
                     ),
                 ]
             })
@@ -451,6 +489,7 @@ impl Host for KoharuHost {
                 .await
             }
             "run_pipeline" => self.run_pipeline(arguments(&call)?, control).await,
+            "full_context_translate" => self.run_full_context(control).await,
             name => bail!("unknown Koharu tool {name}"),
         }
     }
@@ -696,3 +735,6 @@ impl RunPipeline {
         }
     }
 }
+
+#[derive(Deserialize, JsonSchema)]
+struct RunFullContext {}

@@ -274,7 +274,7 @@ impl Project {
         Ok(Self::new(session, name))
     }
 
-    fn new(session: Session, name: String) -> Self {
+    pub(crate) fn new(session: Session, name: String) -> Self {
         let active_page = session.snapshot().pages().next().map(|page| page.id());
         Self {
             session,
@@ -521,6 +521,39 @@ impl Project {
             }
         })?;
         self.commit(patch).await
+    }
+
+    /// Writes a machine-generated translation, preserving user-authored text.
+    ///
+    /// Returns `None` when the content already carries a user translation.
+    pub(crate) async fn set_translation_generated(
+        &mut self,
+        layer: EntityId,
+        text: String,
+        generation: koharu_scene::Generation,
+        language: Option<koharu_scene::LanguageTag>,
+    ) -> Result<Option<Commit>> {
+        let snapshot = self.snapshot();
+        let content = Self::text_content(&snapshot, layer)?;
+        if snapshot
+            .component::<SceneTranslation>(content)?
+            .is_some_and(|value| matches!(value.text.origin, Origin::User))
+        {
+            return Ok(None);
+        }
+        // `edit_as` stamps the generation on authored components; a plain edit
+        // would downgrade the origin to `User`.
+        let mut edit = snapshot.edit_as(generation.clone());
+        edit.observe::<SceneSourceText>(content)?;
+        edit.observe::<SceneTranslation>(content)?;
+        edit.set(
+            content,
+            &SceneTranslation {
+                text: Authored::generated(text, generation),
+                language,
+            },
+        )?;
+        Ok(Some(self.commit(edit.finish()?).await?))
     }
 
     pub(crate) async fn set_typography(

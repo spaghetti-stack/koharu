@@ -128,6 +128,7 @@
     "currentPageDescription": "Process only the page in the canvas.",
     "entireProject": "Entire project",
     "entireProjectDescription": "Process every page in this project.",
+    "fullContext": "Full-context translate",
     "model": "Model",
     "noModel": "No model",
     "notSet": "Not set",

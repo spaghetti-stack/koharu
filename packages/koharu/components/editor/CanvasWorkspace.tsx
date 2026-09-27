@@ -322,7 +322,7 @@ export function CanvasWorkspace() {
         event.preventDefault()
         return
       }
-      if (editable(event.target)) return
+      if (editable(event.target) || editable(document.activeElement)) return
       const state = useKoharuStore.getState()
       if (event.code === 'Space') {
         spaceHeld.current = true

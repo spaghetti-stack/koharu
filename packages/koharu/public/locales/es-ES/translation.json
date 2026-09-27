@@ -128,6 +128,7 @@
     "currentPageDescription": "Procesa solo la página del lienzo.",
     "entireProject": "Proyecto completo",
     "entireProjectDescription": "Procesa todas las páginas de este proyecto.",
+    "fullContext": "Traducción con contexto completo",
     "model": "Modelo",
     "noModel": "Sin modelo",
     "notSet": "Sin definir",

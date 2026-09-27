@@ -40,18 +40,18 @@ macro_rules! log_cs {
     };
 }
 log_cs!(
+    tracing_core::Level::TRACE,
+    TRACE_CS,
+    TRACE_META,
+    TRACE_FIELDS,
+    TraceCallsite
+);
+log_cs!(
     tracing_core::Level::DEBUG,
     DEBUG_CS,
     DEBUG_META,
     DEBUG_FIELDS,
     DebugCallsite
-);
-log_cs!(
-    tracing_core::Level::INFO,
-    INFO_CS,
-    INFO_META,
-    INFO_FIELDS,
-    InfoCallsite
 );
 log_cs!(
     tracing_core::Level::WARN,
@@ -87,8 +87,11 @@ fn meta_for_level(
     level: koharu_llama_sys::ggml_log_level,
 ) -> (&'static Metadata<'static>, &'static OverridableFields) {
     match level {
-        koharu_llama_sys::GGML_LOG_LEVEL_DEBUG => (&DEBUG_META, &DEBUG_FIELDS),
-        koharu_llama_sys::GGML_LOG_LEVEL_INFO => (&INFO_META, &INFO_FIELDS),
+        // llama.cpp's INFO messages (model load, KV cache, scheduler) are
+        // diagnostic noise for normal use, so they surface only with debug
+        // logging enabled instead of flooding the default INFO log.
+        koharu_llama_sys::GGML_LOG_LEVEL_DEBUG => (&TRACE_META, &TRACE_FIELDS),
+        koharu_llama_sys::GGML_LOG_LEVEL_INFO => (&DEBUG_META, &DEBUG_FIELDS),
         koharu_llama_sys::GGML_LOG_LEVEL_WARN => (&WARN_META, &WARN_FIELDS),
         koharu_llama_sys::GGML_LOG_LEVEL_ERROR => (&ERROR_META, &ERROR_FIELDS),
         _ => {
@@ -378,7 +381,8 @@ mod tests {
 
     #[test]
     fn cont_enabled_log() {
-        let logger = create_logger(tracing::Level::INFO);
+        // llama.cpp INFO now maps to tracing DEBUG, so enable DEBUG to observe it.
+        let logger = create_logger(tracing::Level::DEBUG);
         let mut log_state = Box::new(State::new(Module::LlamaCpp, LogOptions::default()));
         let log_ptr = log_state.as_mut() as *mut State as *mut std::os::raw::c_void;
 

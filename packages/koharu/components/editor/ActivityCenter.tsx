@@ -156,6 +156,24 @@ function JobItem({ job }: { job: Job }) {
             {job.model}
           </p>
         ) : null}
+        {job.cost !== null ? (
+          <p className='col-start-2 col-end-4 truncate text-[10px] text-muted-foreground tabular-nums'>
+            ${job.cost.toFixed(4)}
+          </p>
+        ) : null}
+        {job.detail ? (
+          <p className='col-start-2 col-end-4 truncate text-[10px] text-muted-foreground tabular-nums'>
+            {job.detail}
+          </p>
+        ) : null}
+        {job.source ? (
+          <p className='col-start-2 col-end-4 truncate text-[10px] text-muted-foreground'>
+            {t('activity.pageSource', {
+              source: job.source === 'content' ? 'output' : job.source,
+              defaultValue: `via ${job.source === 'content' ? 'output' : job.source}`,
+            })}
+          </p>
+        ) : null}
         <div className='col-start-2 col-end-4'>
           <Progress value={percent} />
         </div>

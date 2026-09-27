@@ -2,6 +2,7 @@ pub(crate) mod agent;
 pub(crate) mod canvas;
 pub(crate) mod editing;
 pub(crate) mod fonts;
+pub(crate) mod full_context;
 pub(crate) mod import;
 pub(crate) mod lifecycle;
 pub(crate) mod output;
@@ -88,6 +89,7 @@ pub fn bindings() -> tauri_specta::Builder<tauri_runtime_cef::CefRuntime> {
             editing::redo,
             processing::process,
             processing::stop_job,
+            full_context::full_context_translate,
             output::export,
             output::export_texts,
             output::import_texts,

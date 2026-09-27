@@ -47,6 +47,13 @@ pub struct Job {
     pub page: Option<koharu_scene::EntityId>,
     pub stage: Option<koharu_pipeline::Stage>,
     pub model: Option<String>,
+    /// Latest provider reply, for live whole-work diagnostics.
+    pub detail: Option<String>,
+    /// Source of the live page detection: `reasoning` or `content`.
+    pub source: Option<String>,
+    /// Cumulative provider cost reported for the job, when the provider
+    /// reports it.
+    pub cost: Option<f64>,
     pub error: Option<String>,
 }
 
@@ -106,6 +113,9 @@ pub(crate) async fn process(
         page: None,
         stage: None,
         model: None,
+        detail: None,
+        source: None,
+        cost: None,
         error: None,
     };
     processing.jobs.lock().insert(id, job.clone());
